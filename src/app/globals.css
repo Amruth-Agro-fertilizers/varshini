@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surfaces — warm white, matching the sunlit whites of the plant photography. */
+  --color-paper: #fbfaf7;
+  --color-paper-soft: #f2f0ea;
+  --color-line: #e2e0d8;
+
+  /* Ink */
+  --color-ink: #1b1e19;
+  --color-ink-soft: #5c6158;
+  --color-ink-faint: #8d9288;
+
+  /* A single restrained accent. Green belongs to this brand, but as a mark —
+     not as a wash over the whole page. */
+  --color-accent: #2f6b3c;
+  --color-accent-soft: #eaf1e8;
+
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), Georgia, serif;
+
+  /* Display scale — clamped so the massive type never overflows a phone */
+  --text-mega: clamp(3rem, 13vw, 12rem);
+  --text-huge: clamp(2.25rem, 7vw, 5.5rem);
+  --text-eyebrow: clamp(0.65rem, 0.9vw, 0.78rem);
+}
+
+html {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  /* Lenis drives scrolling; native smooth behaviour would fight it. */
+  scroll-behavior: auto;
+}
+
+body {
+  background-color: var(--color-paper);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/**
+ * Legibility for chrome laid over photography.
+ *
+ * Three shadows, not one. The sky behind the masthead is nearly white at
+ * sunrise, so white type on it has no edge of its own: the tight pair draws
+ * that edge back, and the wide, soft third sits under the whole word as a
+ * halo, which is what stops the type dissolving into a bright sky the way a
+ * single tight shadow let it. Cheaper and less destructive than dimming the
+ * photograph far enough to carry plain white text.
+ */
+.on-photo {
+  text-shadow:
+    0 1px 2px rgba(10, 12, 8, 0.7),
+    0 2px 8px rgba(10, 12, 8, 0.45),
+    0 10px 34px rgba(10, 12, 8, 0.4);
+}
+
+/**
+ * Chrome that has to read on anything.
+ *
+ * For the pieces a shadow alone cannot carry — small caps at wide tracking,
+ * and the tap targets around them. A dark, unblurred field: blurring what is
+ * behind the nav smears the photograph the same way it smeared the cards, and
+ * a flat scrim keeps the plate underneath sharp.
+ */
+.chrome-field {
+  background-color: rgba(14, 17, 12, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 34px -16px rgba(10, 12, 8, 0.75);
+}
+
+.rule {
+  height: 1px;
+  background: var(--color-line);
+}
+
+/**
+ * Opaque content surface.
+ *
+ * Content sections sit on this rather than floating over the photography.
+ * Copy on top of a busy, moving plate is the single biggest source of the
+ * "messy and blurry" reading — solid white gives every section a clean,
+ * high-contrast field of its own, and lets the photographic beats between
+ * sections land at full strength.
+ */
+.surface {
+  background-color: var(--color-paper);
+  position: relative;
+  z-index: 1;
+}
+
+/**
+ * A surface that emerges from the frame behind it.
+ *
+ * Used where a hard white edge would cut the reader out of the plant — the
+ * photograph bleeds through the top of the block and settles into paper by the
+ * time the copy starts, so the section reads as part of the same space rather
+ * than as a panel dropped on top of it.
+ */
+.surface-blend {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(251, 250, 247, 0) 0%,
+    rgba(251, 250, 247, 0.55) 12%,
+    rgba(251, 250, 247, 0.88) 30%,
+    rgba(251, 250, 247, 0.97) 55%,
+    var(--color-paper) 78%
+  );
+}
+
+/* Card: crisp edges and a soft shadow. Deliberately no backdrop-filter —
+   blurring whatever sits behind a card is what made the old panels muddy. */
+.card {
+  background-color: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgba(27, 30, 25, 0.04),
+    0 12px 32px -18px rgba(27, 30, 25, 0.18);
+}
+
+/* Travelling highlight on the hero's scroll cue. */
+@keyframes scrollcue {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(340%);
+    opacity: 0;
+  }
+}
