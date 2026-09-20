@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @theme {
+  /* The field behind everything.
+     Plates used to run edge to edge at every moment, so what sat behind them
+     never showed and paper was as good as anything. Once a screen shrinks away
+     from the frame there is suddenly a *behind*, and paper there reads as a
+     missing image rather than as space. Near-black instead of pure, so it sits
+     with the ink rather than punching a hole in the page. */
+  --color-void: #07080b;
+
   /* Surfaces — warm white, matching the sunlit whites of the plant photography. */
   --color-paper: #fbfaf7;
   --color-paper-soft: #f2f0ea;
@@ -27,14 +35,14 @@
 }
 
 html {
-  background-color: var(--color-paper);
+  background-color: var(--color-void);
   color: var(--color-ink);
   /* Lenis drives scrolling; native smooth behaviour would fight it. */
   scroll-behavior: auto;
 }
 
 body {
-  background-color: var(--color-paper);
+  background-color: var(--color-void);
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;

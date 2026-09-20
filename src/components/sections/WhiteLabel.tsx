@@ -19,7 +19,16 @@ export default function WhiteLabel() {
 
   return (
     <section ref={root} id="white-label" className="relative">
-      <Interlude caption="Section 02 · White-label supply" />
+      {/*
+        Long enough to outlast the hand-off.
+        The screen before this one closes away onto black, black is held, and
+        then this one opens out of the middle — a third of the way into the
+        section before the frame is whole again. An opaque page arriving under
+        that puts a hard paper edge across the bottom of a plate that is still
+        growing, which is what made the hand-off look broken. The paper waits
+        until the frame has finished opening.
+      */}
+      <Interlude caption="Section 02 · White-label supply" height="h-[230vh]" />
 
       <div className="surface">
       <div className="px-6 pb-16 pt-32 md:px-12 md:pt-40">

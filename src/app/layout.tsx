@@ -30,13 +30,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#fbfaf7',
+  themeColor: '#07080b',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${anton.variable} ${archivo.variable} ${instrument.variable}`}>
-      <body className="bg-paper text-ink antialiased">{children}</body>
+      <body className="bg-void text-ink antialiased">{children}</body>
     </html>
   );
 }

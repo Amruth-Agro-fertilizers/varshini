@@ -9,13 +9,30 @@
 
 const encodePath = (p: string) => p.split('/').map(encodeURIComponent).join('/');
 
+/**
+ * Sub-path the site is served from — see next.config.ts.
+ *
+ * Applied by hand to every URL the scene loads, because `basePath` does not
+ * reach them. Next rewrites the things it owns: its own bundles, `<Link>`, and
+ * `next/image`. A plain string handed to a three.js loader is just a fetch, and
+ * a fetch for `/opt/...` from a site living at `/varshini/` asks the domain
+ * root and gets nothing — so on Pages the page would render black with every
+ * photograph and model missing, and no error in the console beyond the 404s.
+ */
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 /** WebP sibling of a source asset — use for WebGL textures. */
 export function opt(sourcePath: string): string {
   const webp = sourcePath.replace(/^\/assets\//, '/opt/').replace(/\.[^.]+$/, '.webp');
-  return encodePath(webp);
+  return BASE + encodePath(webp);
 }
 
-/** Original asset, URL-encoded — use with next/image, which optimizes on its own. */
+/**
+ * Original asset, URL-encoded — use with next/image.
+ *
+ * Deliberately *not* prefixed: next/image applies the base path itself, and
+ * doing it here as well would ask for /varshini/varshini/assets/...
+ */
 export function raw(sourcePath: string): string {
   return encodePath(sourcePath);
 }
@@ -57,7 +74,7 @@ export const ABSTRACT = {
 
 export const MODELS = {
   /** Flock of five, rigged, with a baked wingbeat. */
-  birds: '/models/birds.glb',
+  birds: `${BASE}/models/birds.glb`,
   /**
    * The headline as a modelled object.
    *
@@ -66,7 +83,7 @@ export const MODELS = {
    * asset on the page and the reason it is fetched alongside the hero plate
    * rather than discovered after it.
    */
-  headline: '/models/your-brand-our-plant.glb',
+  headline: `${BASE}/models/your-brand-our-plant.glb`,
 } as const;
 
 export const CATALOGUE = {
@@ -76,6 +93,10 @@ export const CATALOGUE = {
   bioKRich: '/assets/fertilisers-images/amruth-bio-k-rich-powder-fertilizer-500x500.webp',
 } as const;
 
-export const FONT_DISPLAY_URL = '/fonts/Anton-Regular.ttf';
-export const FONT_SERIF_URL = '/fonts/InstrumentSerif-Italic.ttf';
+/*
+ * The display faces are loaded through next/font in the layout, not fetched by
+ * URL. The two raw paths that used to live here fed the SDF headline that the
+ * modelled one replaced, and were dead — worth removing rather than leaving as
+ * two more URLs that would silently need a base path.
+ */
 

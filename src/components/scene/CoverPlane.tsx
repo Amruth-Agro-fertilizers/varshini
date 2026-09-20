@@ -29,6 +29,10 @@ type Props = {
   /** Multiplier on the tint, sampled every frame. Above 1 blows the plate out
    *  toward white — an exposure change, not a fade. */
   exposure?: number | (() => number);
+  /** Uniform scale about the plate's own centre, sampled every frame. Below 1
+   *  pulls it in off the frame edges, which is only visible because there is
+   *  now something behind it to see. */
+  scale?: number | (() => number);
   /** Reports the solved plane size, for anything that has to line up with its edges. */
   onSize?: (size: { width: number; height: number }) => void;
 };
@@ -66,6 +70,7 @@ export default function CoverPlane({
   offsetY = 0,
   offsetX = 0,
   exposure,
+  scale,
   onSize,
 }: Props) {
   const { size, gl } = useThree();
@@ -107,6 +112,10 @@ export default function CoverPlane({
     if (mesh.current) {
       mesh.current.position.x = read(offsetX);
       mesh.current.position.y = read(offsetY);
+      if (scale !== undefined) {
+        const s = read(scale);
+        mesh.current.scale.set(s, s, 1);
+      }
     }
   });
 
