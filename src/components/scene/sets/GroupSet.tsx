@@ -36,9 +36,9 @@ const WIPE_TO = 0.62;
  *
  * The interior is the base plate rather than the arrival, even though it is
  * seen second. It is the one that has to still be there at the end to hand over
- * to white-label, so it takes the section's own exit wipe; the aerial is the
- * overlay that clears off it. Staging it the other way would leave the
- * interior stranded on screen with nothing to move it.
+ * to white-label, so it takes the section's own exit; the aerial is the overlay
+ * that clears off it. Staging it the other way would leave the interior
+ * stranded on screen with nothing to move it.
  */
 export default function GroupSet() {
   const edge = useRef<THREE.Mesh>(null);
@@ -66,7 +66,8 @@ export default function GroupSet() {
     <SectionSet section="group">
       {/* The plant floor, uncovered by the wipe and held to the end of the
           section. Its own hand-off to white-label is the standard one. */}
-      <Backdrop section="group" src={FRAMES.interior} />
+      {/* Closes in on itself onto black — see Backdrop's `shrink`. */}
+      <Backdrop section="group" src={FRAMES.interior} exit="shrink" />
 
       {/* The aerial the section opens on. Flares and settles as the camera
           comes through the cloud, then lifts away. */}

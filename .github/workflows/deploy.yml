@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+# Required by actions/deploy-pages: it mints an OIDC token to publish.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a superseded run is cancelled rather than queued.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build static export
+        run: npm run build
+        env:
+          # The repository name the project site is served under. Everything
+          # that resolves a URL reads this — see next.config.ts and lib/assets.
+          NEXT_PUBLIC_BASE_PATH: /varshini
+
+      - name: Disable Jekyll
+        # Without this GitHub runs the published files through Jekyll, which
+        # skips every path beginning with an underscore — and Next puts all of
+        # its JavaScript and CSS in _next/. The site would load as an unstyled,
+        # scriptless page. public/.nojekyll covers it, this is the belt to that
+        # pair of braces.
+        run: touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

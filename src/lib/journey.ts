@@ -155,7 +155,7 @@ export function cloudOpacity(): number {
   // arrives to end it — and it stays on well past the fog, so the plant front
   // view is uncovered with cloud still breaking over it rather than appearing
   // in clear air the instant the white lifts.
-  return clamp01(smoothstep(remap(t, 2.05, 2.45, 1, 0)));
+  return clamp01(smoothstep(remap(t, 1.55, 1.82, 1, 0)));
 }
 
 /**
@@ -196,6 +196,70 @@ export function arrivalExposure(key: SectionKey, peak = 1.45): number {
   const t = getCameraTime();
   const i = sectionIndex(key);
   return remap(t, i + 0.05, i + 0.34, peak, 1);
+}
+
+/**
+ * The shrink hand-off: a screen closes in on itself, and the next one opens.
+ *
+ * Every other hand-off on this page works by keeping one plate opaque and
+ * moving it, because two photographs cannot be blended. This one does not
+ * blend either — it makes the space between them empty. The outgoing plate
+ * pulls in off the frame edges onto black and goes; there is a beat of nothing;
+ * the next plate opens out of the middle.
+ *
+ * The order is the whole trick, and it is the reverse of the wipe's. A wiped
+ * plate needs the next one already at full opacity *behind* it, so that what is
+ * uncovered is solid. A shrinking plate needs exactly the opposite: if the next
+ * plate is sitting there at full size the shrink simply reveals it, and there
+ * is no black, no beat, and no sense of one screen closing before another
+ * opens. So `expandIn` holds the arriving plate at nothing until the outgoing
+ * one has finished leaving.
+ */
+
+/** Camera-time window the outgoing plate closes across. */
+const SHRINK_OUT: [number, number] = [0.9, 1.06];
+/** And the window the next one opens across, after a beat of black. */
+const SHRINK_IN: [number, number] = [1.13, 1.33];
+
+/** Scale for a plate leaving by shrinking, 1 down to a fraction of the frame. */
+export function shrinkScale(key: SectionKey): number {
+  const t = getCameraTime();
+  const i = sectionIndex(key);
+  return 1 - 0.78 * smoothstep(remap(t, i + SHRINK_OUT[0], i + SHRINK_OUT[1], 0, 1));
+}
+
+/**
+ * Opacity for a plate leaving by shrinking.
+ *
+ * Held solid almost the whole way in and cut at the end, while it is small and
+ * still moving. Fading it across the shrink would put a half-transparent
+ * photograph over black, which reads as a fault rather than as distance.
+ */
+export function shrinkOpacity(key: SectionKey): number {
+  const t = getCameraTime();
+  const i = sectionIndex(key);
+  return clamp01(remap(t, i + SHRINK_OUT[1] - 0.03, i + SHRINK_OUT[1], 1, 0));
+}
+
+/** Scale for a plate arriving by opening out of the middle. */
+export function expandScale(key: SectionKey): number {
+  const t = getCameraTime();
+  const i = sectionIndex(key);
+  return 0.3 + 0.7 * smoothstep(remap(t, i - 1 + SHRINK_IN[0], i - 1 + SHRINK_IN[1], 0, 1));
+}
+
+/**
+ * Opacity for a plate arriving by opening.
+ *
+ * Nothing until the beat of black has been held, then solid almost at once —
+ * so the plate is a small opaque window that grows, not a picture fading up.
+ */
+export function expandOpacity(key: SectionKey): number {
+  const t = getCameraTime();
+  const i = sectionIndex(key);
+  const open = clamp01(remap(t, i - 1 + SHRINK_IN[0], i - 1 + SHRINK_IN[0] + 0.04, 0, 1));
+  const retire = remap(t, i + 1.16, i + 1.2, 1, 0);
+  return clamp01(open * retire);
 }
 
 /**
